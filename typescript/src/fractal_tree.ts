@@ -52,17 +52,17 @@ export class Branch {
 
 export class FractalTree {
 
-  private trunkLength = 150
-  private minBranchMultiplier = 0.45
-  private maxBranchMultiplier = 0.85
-  private leafThreshold: number
-  private minLength = 3
+  protected trunkLength: number
+  protected minBranchMultiplier: number
+  protected maxBranchMultiplier: number
+  protected leafThreshold: number
+  protected minLength: number
   
-  private startAngle = 270
-  private minAngle = -65
-  private maxAngle = 65
+  protected startAngle: number
+  protected minAngle: number
+  protected maxAngle: number
   
-  private numBranches = [2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 5, 5, 6]
+  protected numBranches: number[]
 
   private startPos: Point
   private width: number
@@ -81,7 +81,6 @@ export class FractalTree {
     // Place the starting point at width/2, height because the canvas
     // origin is at the top-left corner
     this.startPos = new Point(width / 2, height)
-    this.leafThreshold = random.getRandomInt(5, 25)
     this.branches = new Array<Branch>()
   }
 
@@ -231,5 +230,44 @@ export class FractalTree {
     // Finally append the species
     treeName.push(random.getValueFromArray(names.SPECIES))
     this.name = treeName.join(" ")
+  }
+}
+
+export class DefaultTree extends FractalTree {
+  
+  constructor(width: number, height: number) {
+    super(width, height)
+
+    this.trunkLength = 150
+    this.minBranchMultiplier = 0.45
+    this.maxBranchMultiplier = 0.85
+    this.minLength = 3
+    this.leafThreshold = random.getRandomInt(5, 25)
+    
+    this.startAngle = random.getRandomInt(265, 275)
+    this.minAngle = -65
+    this.maxAngle = 65
+    
+    this.numBranches = [2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 5, 5, 6]
+  }
+}
+
+// TODO: This breaks when trying to run it in the browser
+export class BushyTree extends FractalTree {
+  
+  constructor(width: number, height: number) {
+    super(width, height)
+
+    this.trunkLength = 150
+    this.minBranchMultiplier = 0.50
+    this.maxBranchMultiplier = 0.85
+    this.minLength = 3
+    this.leafThreshold = random.getRandomInt(10, 25)
+    
+    this.startAngle = random.getRandomInt(265, 275)
+    this.minAngle = -55
+    this.maxAngle = 55
+    
+    this.numBranches = [2, 3, 3, 4, 4, 4, 5, 5, 6]
   }
 }
