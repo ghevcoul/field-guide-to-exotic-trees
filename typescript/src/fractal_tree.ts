@@ -65,6 +65,8 @@ export class FractalTree {
   private numBranches = [2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 5, 5, 6]
 
   private startPos: Point
+  private width: number
+  private height: number
 
   branches: Branch[]
   barkColour: string  // RGB string of colour
@@ -74,6 +76,8 @@ export class FractalTree {
   name: string
 
   constructor(width: number, height: number) {
+    this.width = width
+    this.height = height
     // Place the starting point at width/2, height because the canvas
     // origin is at the top-left corner
     this.startPos = new Point(width / 2, height)
@@ -83,9 +87,51 @@ export class FractalTree {
 
   generate() {
     this.buildTree(this.startPos, this.trunkLength, this.startAngle)
+    this.normalize()
     this.selectBarkColour()
     this.selectFoliageColour()
     this.createTreeName()
+  }
+
+  private normalize() {
+    // Normalize the Tree by making all the coordinates positive
+    const xVals = this.branches.flatMap(b => [b.line.start.x, b.line.end.x])
+    const yVals = this.branches.flatMap(b => [b.line.start.y, b.line.end.y])
+    const xMin = Math.min(...xVals)
+    const xMax = Math.max(...xVals)
+    const yMin = Math.min(...yVals)
+    const yMax = Math.max(...yVals)
+
+    console.log(xMin, yMin)
+    console.log(xMax, yMax)
+
+    var xShift = 0
+    var yShift = 0
+    if (xMin < 0 && xMax > this.width) {
+      // TODO: do more than just give up
+      xShift = 0
+    } else if (xMin < 0) {
+      xShift = Math.abs(xMin)
+    } else if (xMax > this.width) {
+      xShift = this.width - xMax
+    }
+    if (yMin < 0 && yMax > this.height) {
+      // TODO: do more than just give up
+      yShift = 0
+    } else if (yMin < 0) {
+      yShift = Math.abs(yMin)
+    } else if (yMax > this.width) {
+      yShift = this.width - yMax
+    }
+
+    console.log(xShift, yShift)
+
+    for (const branch of this.branches) {
+      branch.line = new LineSegment(
+        new Point(branch.line.start.x + xShift, branch.line.start.y + yShift), 
+        new Point(branch.line.end.x + xShift, branch.line.end.y + yShift)
+      )
+    }
   }
 
   // Private recursive function to build a tree
@@ -132,7 +178,7 @@ export class FractalTree {
   }
 
   // In order to get variety in the names, there will be a lot of options for modifiers with only 1-3 of them chosen for each tree.
-  // A final tree name will be something like: ModiferA ModifierB Species, e.g. Eastern Swamp Chestnut or Russian Flowering Aspen
+  // A final tree name will be something like: ModifierA ModifierB Species, e.g. Eastern Swamp Chestnut or Russian Flowering Aspen
   // Modifier types that can be chosen with some examples:
   // Direction - Northern, Western
   // Region - American, European, Mediterranean
